@@ -1,0 +1,59 @@
+import java.util.Scanner;
+
+public class PasswordStrengthChecker {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter a password to check its strength: ");
+        String password = scanner.nextLine();
+
+        String strength = checkPasswordStrength(password);
+
+        System.out.println("Password strength: " + strength);
+    }
+
+    public static String checkPasswordStrength(String password) {
+        if (password == null || password.isEmpty()) {
+            return "Invalid (Password cannot be empty)";
+        }
+
+        boolean hasUpperCase = false;
+        boolean hasLowerCase = false;
+        boolean hasDigit = false;
+        boolean hasSpecialChar = false;
+
+        for (char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                hasUpperCase = true;
+            } else if (Character.isLowerCase(c)) {
+                hasLowerCase = true;
+            } else if (Character.isDigit(c)) {
+                hasDigit = true;
+            } else if (!Character.isLetterOrDigit(c)) {
+                hasSpecialChar = true;
+            }
+        }
+
+        int strengthScore = 0;
+
+        if (password.length() >= 8) strengthScore++;
+        if (hasUpperCase) strengthScore++;
+        if (hasLowerCase) strengthScore++;
+        if (hasDigit) strengthScore++;
+        if (hasSpecialChar) strengthScore++;
+
+        switch (strengthScore) {
+            case 5:
+                return "Very Strong";
+            case 4:
+                return "Strong";
+            case 3:
+                return "Moderate";
+            case 2:
+                return "Weak";
+            default:
+                return "Very Weak";
+        }
+    }
+}
