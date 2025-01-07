@@ -1,0 +1,83 @@
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+class SharedResource {
+    private int count = 0;
+    private final Lock lock = new ReentrantLock();
+    
+    public void increment() {
+        lock.lock(); // Locking the resource
+        try {
+            count++;
+            System.out.println(Thread.currentThread().getName() + " incremented count to: " + count);
+        } finally {
+            lock.unlock(); // Unlocking the resource
+        }
+    }
+    
+    public synchronized void decrement() { // Synchronized method
+        count--;
+        System.out.println(Thread.currentThread().getName() + " decremented count to: " + count);
+    }
+}
+
+class IncrementThread extends Thread {
+    private final SharedResource resource;
+    
+    public IncrementThread(SharedResource resource) {
+        this.resource = resource;
+    }
+    
+    @Override
+    public void run() {
+        for (int i = 0; i < 5; i++) {
+            resource.increment();
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+class DecrementThread extends Thread {
+    private final SharedResource resource;
+    
+    public DecrementThread(SharedResource resource) {
+        this.resource = resource;
+    }
+    
+    @Override
+    public void run() {
+        for (int i = 0; i < 5; i++) {
+            resource.decrement();
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+class MultiThreadedApp {
+    public static void main(String[] args) {
+        SharedResource resource = new SharedResource();
+        
+        Thread t1 = new IncrementThread(resource);
+        Thread t2 = new DecrementThread(resource);
+        
+        t1.start();
+        t2.start();
+        
+        try {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+        System.out.println("Final count value: " + resource);
+    }
+}
